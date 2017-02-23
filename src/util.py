@@ -66,11 +66,11 @@ import sklearn.metrics as metrics
 
 #import cv2
 
-PROJECT_NAME = 'cat_dog'
+PROJECT_NAME = 'fm-aug'
 PROJECT_DIR = "/" + PROJECT_NAME +"/"
 
 def full_path(fname, dir_ = 'data'):
-    DATA_DIR = '../../' + dir_ + PROJECT_DIR
+    DATA_DIR = '../' + dir_
     return DATA_DIR + fname 
 
 #img = Image.open("AFLAC.jpg").transpose(Image.FLIP_LEFT_RIGHT)
@@ -82,31 +82,6 @@ def preprocess_image(image_path, target_size = (224,224), flip = None):
     img = np.expand_dims(img, axis=0)
     img = vgg16.preprocess_input(img)
     return img
-
-#from vgg_utils
-def plots(ims, figsize=(12,6), rows=1, interp=False, titles=None):
-    if type(ims[0]) is np.ndarray:
-        ims = np.array(ims).astype(np.uint8)
-        if (ims.shape[-1] != 3):
-            ims = ims.transpose((0,2,3,1))
-    f = plt.figure(figsize=figsize)
-    for i in range(len(ims)):
-        sp = f.add_subplot(rows, len(ims)//rows, i+1)
-        if titles is not None:
-            sp.set_title(titles[i], fontsize=18)
-        plt.imshow(ims[i], interpolation=None if interp else 'none')
-        
-#img = Image.open("AFLAC.jpg").transpose(Image.FLIP_LEFT_RIGHT)
-# def prep_x_y(img_df, idx, target_size = (224,224), flip = None):
-#     tmp = [preprocess_image(img_df.path[i], target_size = target_size, flip = flip) for i in idx]
-#     x = np.concatenate(tmp, axis = 0)
-#     y = np.array(img_df.dog[idx]).astype(np.float32)
-#     return x,y
-# 
-# def prep_x(img_df, idx, target_size = (224,224), flip = None):
-#     tmp = [preprocess_image(img_df.path[i], target_size = target_size, flip = flip) for i in idx]
-#     x = np.concatenate(tmp, axis = 0)
-#     return x
 
 def prep_x_y(img_df, target_size = (224,224), flip = None):
     tmp = [preprocess_image(r.path, target_size = target_size, flip = flip) for r in img_df.itertuples(index=False)]
@@ -145,23 +120,6 @@ def gen_batch_wrap(gen, batch_size = 32):
         else:
             yield x_arr
             
-#crop fun
-def make_crop_fun(crop_size, max_size = 7):
-    logging.info("make_crop_fun called")
-    def crop_pool(x):
-        #logging.basicConfig(format='%(asctime)s %(message)s', filename=full_path('general.log', 'log'), level=logging.INFO)
-        stride = [0,0]
-        stride[0] = np.random.randint(max_size - crop_size + 1)
-        stride[1] = np.random.randint(max_size - crop_size + 1)
-        logging.info("sride: %s", stride)
-        res = x[:,stride[0]:crop_size+stride[0],stride[1]:crop_size+stride[1],:]
-        #and random flip
-        if np.random.binomial(1,0.5):
-            #res = np.fliplr(res)
-            res = res[:,::-1]
-        return res
-    return crop_pool
-
 def conv_crop_gen(X, y, crop_fun):
     while True:
         for i in np.random.permutation(X.shape[0]):

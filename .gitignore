@@ -1,0 +1,12 @@
+data/
+books
+log/
+subm/
+tmp/
+out/
+#.*
+
+#notebooks
+#*.ipynb
+#compiled python
+*.pyc
