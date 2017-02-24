@@ -5,7 +5,7 @@ subm/
 tmp/
 out/
 #.*
-
+.ipy*/
 #notebooks
 #*.ipynb
 #compiled python
